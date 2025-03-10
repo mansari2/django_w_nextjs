@@ -1,0 +1,24 @@
+services:
+  web:
+    build:
+      context: ./client/
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000" # expose local port
+    volumes:
+      - ./client/:/usr/src/app # mount local working directory for live reload
+      - /usr/src/app/node_modules # mount node_modules for caching
+    environment:
+      - NEXT_PUBLIC_HEALTH_CHECK_URL=http://localhost:8000/health-check/
+      - NEXT_PUBLIC_DOC_ANALYSIS_URL=http://localhost:8000/document-analysis/
+  django:
+    build:
+      context: ./server/
+      dockerfile: Dockerfile
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./server/:/usr/src/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=True
